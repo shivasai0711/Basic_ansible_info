@@ -1,0 +1,168 @@
+### Step 14: **Ansible Playbook Debugging**
+
+In the real world, debugging is an essential skill for DevOps engineers, especially when working with automation tools like Ansible. Debugging helps you identify and fix issues, ensuring that your playbooks execute as expected.
+
+Here are some useful techniques for debugging Ansible playbooks:
+
+---
+
+#### **14.1: Enabling Verbose Mode**
+
+One of the simplest ways to debug Ansible playbooks is by using the `-v`, `-vv`, `-vvv`, or `-vvvv` options, which provide varying levels of verbosity. This will give you more detailed information about the execution process, including task statuses and variable outputs.
+
+- **`-v` (verbose)**: Displays basic details about the playbook run, including task results.
+- **`-vv` (more verbose)**: Includes additional details, including gathered facts and variables.
+- **`-vvv` (debugging level 1)**: Provides very detailed output, including Ansible's internal processing and task execution.
+- **`-vvvv` (debugging level 2)**: The highest level of verbosity; includes full debugging output that can help troubleshoot complex issues.
+
+##### **Example: Run Playbook in Verbose Mode**
+```bash
+ansible-playbook -i inventory.ini nginx_playbook.yml -vvv
+```
+
+The output will show detailed information about each task, such as the modules being executed, variables used, and the changes made.
+
+---
+
+#### **14.2: Using the `debug` Module**
+
+Ansible has a built-in `debug` module, which you can use to print variable values, facts, or status messages to help identify issues in the playbook.
+
+##### **Example: Debugging Variables**
+```yaml
+- name: Debug variable values
+  debug:
+    var: db_password
+```
+
+This will print the value of the `db_password` variable during playbook execution. It helps ensure that the variable is set correctly.
+
+##### **Example: Debugging with Custom Messages**
+```yaml
+- name: Debugging message
+  debug:
+    msg: "The installation of NGINX is complete!"
+```
+
+This will print a custom message to the terminal during execution.
+
+---
+
+#### **14.3: Using `ansible-playbook --check` (Dry Run)**
+
+The `--check` option performs a "dry run" of the playbook. It simulates the execution without actually making any changes to the system. This is useful for validating tasks before applying them in production environments.
+
+##### **Example: Dry Run the Playbook**
+```bash
+ansible-playbook -i inventory.ini nginx_playbook.yml --check
+```
+
+This will show you what changes would be made but won't apply them. It's helpful for ensuring that the playbook works as expected before running it for real.
+
+---
+
+#### **14.4: Using `ansible-playbook --diff`**
+
+The `--diff` option allows you to see the differences in files when they are changed. If a task modifies a file, this option will display what was changed in the file compared to its previous state.
+
+##### **Example: Run Playbook with Diff**
+```bash
+ansible-playbook -i inventory.ini nginx_playbook.yml --diff
+```
+
+This is especially helpful when you have tasks that modify configuration files, as it shows you exactly what was modified.
+
+---
+
+#### **14.5: Checking Ansible's Internal State with `ansible-console`**
+
+Ansible also has an interactive mode called `ansible-console`, which allows you to test out individual commands and modules in real time.
+
+##### **Start the Ansible Console**
+```bash
+ansible-console
+```
+
+Once inside the console, you can run Ansible commands interactively, such as testing individual modules or troubleshooting issues. For example:
+```bash
+ansible localhost -m debug -a "var=ansible_facts"
+```
+
+This will show the gathered facts about your machine, which can help you understand the system's state during troubleshooting.
+
+---
+
+#### **14.6: Ansible Logs**
+
+You can enable logging in Ansible to track playbook execution history and errors. To do this, you need to modify the Ansible configuration file (`ansible.cfg`).
+
+##### **Configure Logging in ansible.cfg**
+Add the following to your `ansible.cfg`:
+```ini
+[defaults]
+log_path = /path/to/your/logfile.log
+```
+
+This will log all output from playbook runs to the specified file.
+
+---
+
+#### **14.7: Using `assert` Module to Validate Variables**
+
+Sometimes, you need to ensure that variables have the expected values or conditions before proceeding with the execution of a task. The `assert` module allows you to validate variables and fail gracefully if the condition is not met.
+
+##### **Example: Assert a Variable**
+```yaml
+- name: Assert that db_password is set
+  assert:
+    that:
+      - db_password is defined
+      - db_password != ""
+```
+
+This task will check if the `db_password` variable is defined and is not empty. If the condition is not met, the playbook will fail with an error message.
+
+---
+
+#### **14.8: Using `pause` Module to Pause Execution**
+
+In some cases, you might want to pause the execution of your playbook for a certain amount of time to allow troubleshooting or give time for the system to settle. The `pause` module can be used for this purpose.
+
+##### **Example: Pause Playbook Execution**
+```yaml
+- name: Pause the playbook execution
+  pause:
+    seconds: 10
+    prompt: "Press enter to continue"
+```
+
+This will pause the execution of the playbook for 10 seconds and prompt the user to press "Enter" to continue.
+
+---
+
+#### **14.9: Understanding `ansible-playbook` Output**
+
+When you run a playbook, the output provides useful information for troubleshooting. Here's what the key parts of the output mean:
+
+- **ok**: The task was executed, and no changes were required.
+- **changed**: The task was executed, and changes were made to the system.
+- **failed**: The task failed to execute.
+- **skipped**: The task was skipped, typically due to a condition or variable.
+- **rescued**: The task failed, but Ansible attempted a rescue action.
+- **ignored**: Errors were ignored by the task.
+
+---
+
+### **14.10: Common Playbook Errors and Solutions**
+
+Here are some common errors you may encounter while working with Ansible playbooks and their potential solutions:
+
+- **"Missing required arguments"**: Ensure that all required parameters are provided for each task. For example, if you are using the `apt` module, ensure that both the `name` and `state` parameters are provided.
+- **"Permission Denied"**: This can happen if the user running the playbook doesn't have the necessary privileges. Use `become: true` to run the task as a superuser.
+- **"Host Unreachable"**: If Ansible cannot reach the target host, ensure that the target machine is accessible over SSH and that the correct SSH key or password is provided.
+
+---
+
+By mastering these debugging techniques, you'll be able to troubleshoot and resolve issues in your Ansible playbooks effectively, ensuring smoother automation and better system management.
+
+Let me know if you'd like to dive deeper into any specific debugging technique!

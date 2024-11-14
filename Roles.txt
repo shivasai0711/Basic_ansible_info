@@ -1,0 +1,153 @@
+Step 11: Ansible Roles
+Roles in Ansible allow you to organize playbooks and manage large-scale configurations by grouping tasks, variables, files, templates, and other resources. They make your playbooks more modular, reusable, and easier to manage. Roles are especially useful in complex environments with multiple components, allowing you to separate configuration logic for different services or applications.
+
+Structure of an Ansible Role
+
+When you create a role, Ansible expects a specific directory structure. This is what a typical role directory structure looks like:
+
+
+
+roles/
+└── myrole/
+    ├── defaults/
+    │   └── main.yml         # Default variables for the role
+    ├── files/
+    │   └── ...              # Static files to be transferred
+    ├── handlers/
+    │   └── main.yml         # Handlers that can be notified
+    ├── meta/
+    │   └── main.yml         # Role metadata, including dependencies
+    ├── tasks/
+    │   └── main.yml         # Main tasks for the role
+    ├── templates/
+    │   └── ...              # Jinja2 templates
+    ├── tests/
+    │   └── ...              # Tests for the role
+    └── vars/
+        └── main.yml         # Non-overridable variables for the Role
+
+Key Components of a Role
+
+defaults/main.yml: Holds default values for variables, which can be overridden by other variables.
+files/: Contains static files to be copied to managed hosts.
+handlers/main.yml: Defines handlers, which are tasks that can be triggered by other tasks, typically to restart services.
+meta/main.yml: Contains metadata, including role dependencies.
+tasks/main.yml: Holds the main list of tasks for the role.
+templates/: Contains Jinja2 templates that are dynamically rendered and transferred to managed hosts.
+vars/main.yml: Stores variables that should not be overridden.
+Creating and Using an Ansible Role
+Let’s create a basic role to install and configure NGINX on a web server.
+
+Create the Role Directory Structure
+
+Use the following command to generate the role structure automatically:
+
+bash
+
+ansible-galaxy init nginx
+This will create an nginx role with the structure described above.
+
+Define Tasks in tasks/main.yml
+
+Open roles/nginx/tasks/main.yml and add tasks to install and configure NGINX:
+
+yaml
+
+--
+- name: Install NGINX
+  apt:
+    name: nginx
+    state: present
+  notify: Restart NGINX
+
+- name: Configure NGINX
+  template:
+    src: nginx.conf.j2
+    dest: /etc/nginx/nginx.conf
+  notify: Restart NGINX
+This example installs NGINX and uses a template for configuration.
+The notify statements reference a handler to restart NGINX if the configuration changes.
+Create the Template in templates/
+
+Add a file named nginx.conf.j2 in roles/nginx/templates/:
+
+jinja2
+
+# nginx.conf.j2
+user nginx;
+worker_processes auto;
+events {
+    worker_connections 1024;
+}
+http {
+    include       /etc/nginx/mime.types;
+    default_type  application/octet-stream;
+    sendfile        on;
+    keepalive_timeout  65;
+    server {
+        listen 80;
+        server_name localhost;
+        location / {
+            root   /usr/share/nginx/html;
+            index  index.html index.htm;
+        }
+    }
+}
+This is a basic NGINX configuration file template. You can modify it as needed.
+Define Handlers in handlers/main.yml
+
+Open roles/nginx/handlers/main.yml to define the handler to restart NGINX:
+
+yaml
+
+---
+- name: Restart NGINX
+  service:
+    name: nginx
+    state: restarted
+This handler restarts NGINX whenever notified by a task.
+Define Variables in defaults/main.yml
+
+If you have any default variables for NGINX, add them here. For instance:
+
+yaml
+
+---
+nginx_user: nginx
+nginx_port: 80
+Add the Role to a Playbook
+
+Now that you have defined the role, add it to a playbook to apply the NGINX role to your hosts.
+
+Example Playbook (nginx_playbook.yml):
+
+yam
+
+---
+- name: Apply NGINX role to web servers
+  hosts: webservers
+  become: yes
+  roles:
+    - nginx
+This playbook applies the nginx role to hosts in the webservers group.
+Run the Playbook
+
+Run the playbook to apply the NGINX role:
+
+bash
+
+ansible-playbook -i inventory nginx_playbook.yaml
+
+Benefits of Using Roles
+
+Modularity: Roles allow you to separate concerns and organize code by service or component.
+Reusability: Roles can be reused across different playbooks and projects.
+Readability: Roles keep playbooks clean and concise by grouping related configurations together.
+Scalability: With roles, it’s easier to scale and manage large environments with many configurations.
+
+Best Practices with Roles
+
+Organize Related Tasks: Group all tasks, files, templates, and handlers for a service within a single role.
+Use Default Variables: Place default values in defaults/main.yml, making them easy to override if needed.
+Use Role Dependencies: If a role depends on another role (e.g., a database role for a web server role), specify this in meta/main.yml.
+Document Role Usage: Document required variables and role usage to make roles easier for others to understand and use.

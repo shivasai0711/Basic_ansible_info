@@ -1,9 +1,6 @@
-In Ansible, the state parameter is a crucial attribute in many modules.
- It defines the desired state of the resource (e.g., a package, file, service) 
- on the managed node. The concept of "desired state" allows you to 
- specify exactly how you want something to exist or behave, which makes
-  Ansible playbooks idempotent. This means that re-running a playbook will
-not make unnecessary changes if the resource is already in the specified state.
+In Ansible, the state parameter is a crucial attribute in many modules.It defines the desired state of the resource (e.g., a package, file, service) 
+ on the managed node. The concept of "desired state" allows you to specify exactly how you want something to exist or behave, which makes
+  Ansible playbooks idempotent. This means that re-running a playbook will not make unnecessary changes if the resource is already in the specified state.
 
 Common state Values by Module Type
 Let’s go through a few different types of modules and explain the various state
@@ -11,10 +8,8 @@ Let’s go through a few different types of modules and explain the various stat
 
 1. Package Management Modules (e.g., apt, yum)
 
-present: Ensures the package is installed. If it’s already installed, 
-Ansible does nothing. If it’s not installed, Ansible installs it.
-absent: Ensures the package is not installed. If it’s already installed, 
-Ansible removes it.
+present: Ensures the package is installed. If it’s already installed, Ansible does nothing. If it’s not installed, Ansible installs it.
+absent: Ensures the package is not installed. If it’s already installed, Ansible removes it.
 Example:
 
 yaml
@@ -32,14 +27,11 @@ yaml
 
 2. Service Management Modules (e.g., service)
 
-started: Ensures the service is running. If it’s already running,
- Ansible does nothing. If it’s not running, Ansible starts it.
+started: Ensures the service is running. If it’s already running,Ansible does nothing. If it’s not running, Ansible starts it.
 
-stopped: Ensures the service is stopped. If it’s already stopped,
- Ansible does nothing. If it’s running, Ansible stops it.
+stopped: Ensures the service is stopped. If it’s already stopped,Ansible does nothing. If it’s running, Ansible stops it.
 
-restarted: Restarts the service. This is not idempotent by itself;
- it will restart the service every time the playbook runs.
+restarted: Restarts the service. This is not idempotent by itself;it will restart the service every time the playbook runs.
 
 reloaded: Reloads the service if supported, typically 
 
@@ -55,17 +47,14 @@ yaml
 
 3. File Management Modules (e.g., file)
 
-directory: Ensures that the specified path exists as a directory. 
-If it doesn’t exist, Ansible creates it as a directory.
+directory: Ensures that the specified path exists as a directory. If it doesn’t exist, Ansible creates it as a directory.
 
 file: Ensures that the specified path exists as a file. If it doesn’t exist,
  Ansible creates an empty file.
 
-link: Creates a symbolic link at the specified path, 
-pointing to a defined target.
+link: Creates a symbolic link at the specified path, pointing to a defined target.
 
-absent: Ensures that the specified path does not exist 
-(whether it’s a file, directory, or link). Ansible will delete it if it exists.
+absent: Ensures that the specified path does not exist (whether it’s a file, directory, or link). Ansible will delete it if it exists.
 
 Example:
 
@@ -83,10 +72,8 @@ yaml
 
 4. User Management Modules (e.g., user)
 
-present: Ensures the user account exists. If it already exists,
- Ansible does nothing. If it doesn’t exist, Ansible creates it.
-absent: Ensures the user account does not exist. If it exists, 
-Ansible removes it.
+present: Ensures the user account exists. If it already exists,Ansible does nothing. If it doesn’t exist, Ansible creates it.
+absent: Ensures the user account does not exist. If it exists, Ansible removes it.
 Example:
 
 yaml

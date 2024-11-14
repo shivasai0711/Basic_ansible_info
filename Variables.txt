@@ -1,7 +1,5 @@
-Variables in Ansible allow you to make playbooks more flexible and reusable.
- By using variables, you can define values in one place and then reuse them 
- throughout your playbook. This is particularly useful when writing 
- configurations that need to change based on environment 
+Variables in Ansible allow you to make playbooks more flexible and reusable.By using variables, you can define values in one place and then reuse them 
+ throughout your playbook. This is particularly useful when writing configurations that need to change based on environment 
  (e.g., development, staging, production).
 
 Let’s look at how to define and use variables in Ansible.

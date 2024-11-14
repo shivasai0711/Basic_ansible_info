@@ -1,7 +1,4 @@
-Let’s delve deeper into Ansible modules. Modules are essential in 
-Ansible as they allow you to automate a variety of tasks on managed nodes.
- Understanding how to use them effectively will make your playbooks 
- more powerful and versatile.
+Let’s delve deeper into Ansible modules. Modules are essential in Ansible as they allow you to automate a variety of tasks on managed nodes.Understanding how to use them effectively will make your playbooks more powerful and versatile.
 
 Types of Modules in Ansible
 Ansible modules are divided into categories, 
@@ -119,9 +116,7 @@ yaml
 
 Template Module
 
-Template Rendering: Ansible uses Jinja2 templates, which allow for
- dynamic configurations. Templates are useful for config files where 
- variables change based on environment.
+Template Rendering: Ansible uses Jinja2 templates, which allow for dynamic configurations. Templates are useful for config files where variables change based on environment.
 Example:
 template: Copies a Jinja2 template file to the managed node, 
 rendering any variables.
@@ -157,10 +152,8 @@ yaml
 Using Modules Effectively
 Here are a few tips for working with Ansible modules:
 
-Idempotency: Ansible modules are designed to be idempotent,
- meaning they won’t make changes if the target state is already achieved. 
- For example, if you use the apt module to install a package that’s 
- already installed, it will skip the action.
+Idempotency: Ansible modules are designed to be idempotent, meaning they won’t make changes if the target state is already achieved. 
+ For example, if you use the apt module to install a package that’s already installed, it will skip the action.
 
 Error Handling: Use ignore_errors: yes if you want Ansible to continue even
  if a particular task fails. However, use it cautiously, as it can mask
