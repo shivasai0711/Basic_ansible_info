@@ -1,0 +1,208 @@
+Variables in Ansible allow you to make playbooks more flexible and reusable.
+ By using variables, you can define values in one place and then reuse them 
+ throughout your playbook. This is particularly useful when writing 
+ configurations that need to change based on environment 
+ (e.g., development, staging, production).
+
+Let’s look at how to define and use variables in Ansible.
+
+Types of Variables in Ansible
+
+Playbook-Level Variables: Defined directly in the playbook.
+
+Inventory Variables: Defined in inventory files for specific hosts or groups.
+
+Variable Files: Defined in separate files and then included in playbooks.
+
+Command-Line Variables: Defined when running a playbook with the -e option.
+
+Facts: System information variables gathered from managed hosts.
+
+1. Playbook-Level Variables
+Variables can be defined within the playbook itself under a vars section.
+
+Example:
+
+yaml
+
+---
+- name: Install and start NGINX on web servers
+  hosts: webservers
+  become: yes
+
+  vars:
+    nginx_package: nginx
+    nginx_service: nginx
+
+  tasks:
+    - name: Install NGINX
+      apt:
+        name: "{{ nginx_package }}"
+        state: present
+
+    - name: Start NGINX service
+      service:
+        name: "{{ nginx_service }}"
+        state: started
+        enabled: yes
+{{ nginx_package }} and {{ nginx_service }}: These are variables defined within
+ the playbook that replace hardcoded values. They use Jinja2 syntax
+  with double curly braces.
+
+2. Inventory Variables
+You can define variables in the inventory file, 
+either for specific hosts or groups.
+
+Example:
+
+ini
+
+[webservers]
+webserver1 ansible_host=192.168.1.10 ansible_user=ubuntu nginx_port=8080
+webserver2 ansible_host=192.168.1.11 ansible_user=ubuntu nginx_port=9090
+In the above example, nginx_port is defined for each host.
+ This variable can be used within a playbook to set specific values per host.
+
+Usage in Playbook:
+
+yaml
+
+- name: Configure NGINX on web servers
+  hosts: webservers
+  tasks:
+    - name: Print NGINX port for each server
+      debug:
+        msg: "NGINX is configured to run on port {{ nginx_port }}"
+
+3. Variable Files
+Variable files allow you to store variables separately and then include
+ them in a playbook. This helps keep playbooks clean and organized.
+
+Create a variable file named vars.yml:
+
+yaml
+
+# vars.yml
+nginx_package: nginx
+nginx_service: nginx
+nginx_port: 80
+
+Include the variable file in your playbook:
+
+yaml
+
+- name: Deploy NGINX with external variables
+  hosts: webservers
+  become: yes
+  vars_files:
+    - vars.yml
+
+  tasks:
+    - name: Install NGINX
+      apt:
+        name: "{{ nginx_package }}"
+        state: present
+
+    - name: Start NGINX service
+      service:
+        name: "{{ nginx_service }}"
+        state: started
+        enabled: yes
+
+4. Command-Line Variables
+You can also pass variables directly from the command line when running
+a playbook using the -e option (or --extra-vars).
+
+Example:
+
+bash
+
+ansible-playbook -i inventory.ini install_nginx.yml -e "nginx_port=8080"
+
+This allows you to override variables for specific runs, which is helpful
+ for setting values like different ports, versions, or environment-specific 
+ details.
+
+5. Facts (System Information)
+Facts are system-specific variables that Ansible automatically gathers 
+from managed nodes. They provide information about the system, 
+like IP addresses, OS details, and hardware specs. Facts can be accessed 
+by using the ansible_facts prefix or directly using the fact name.
+
+To view all facts for a host, you can use the setup module.
+
+Example:
+
+yaml
+
+- name: Gather facts about the system
+  hosts: all
+  tasks:
+    - name: Show all facts
+      setup:
+
+    - name: Print the OS type
+      debug:
+        msg: "This server's OS is {{ ansible_facts['os_family'] }}"
+Common facts include:
+
+ansible_facts['os_family'] — OS family (e.g., Debian, RedHat)
+ansible_facts['default_ipv4']['address'] — Default IP address
+
+6. Registering Variables
+You can dynamically assign values to variables using the register keyword, 
+which saves the result of a task into a variable.
+
+Example:
+
+yaml
+
+- name: Check if NGINX is installed
+  hosts: webservers
+  tasks:
+    - name: Get NGINX package info
+      apt:
+        name: nginx
+        state: present
+      register: nginx_info
+
+    - name: Print the status of NGINX
+      debug:
+        msg: "NGINX installation details: {{ nginx_info }}"
+The nginx_info variable will contain details about the apt task,
+ including whether nginx was newly installed or already present.
+
+Combining Variables and Conditionals
+You can combine variables with conditional statements (when clause) to 
+control task execution based on the value of variables.
+
+Example:
+
+yaml
+
+- name: Conditionally configure NGINX on web servers
+  hosts: webservers
+  vars:
+    nginx_port: 8080
+
+  tasks:
+    - name: Install NGINX only if on Debian OS
+      apt:
+        name: nginx
+        state: present
+      when: ansible_facts['os_family'] == "Debian"
+This task will only run if the managed node’s OS is Debian-based.
+
+Recap
+Define variables at different levels (playbook, inventory, files, command line).
+
+Use Jinja2 syntax ({{ variable_name }}) to reference variables.
+
+Gather facts automatically to get system details.
+
+Register task results to save data for later use.
+
+Combine variables and conditionals to create flexible, reusable playbooks.
+
+This gives you a good foundation for working with variables in Ansible.
+ 
